@@ -22,12 +22,35 @@ public class LoginPanel extends JPanel{
 
     private JLabel errorMessage = new JLabel();
 
+    private JLabel tcpPort = new JLabel("TCP Port");
+    private JLabel udpPort = new JLabel("UDP Port");
+
+    private JTextField tcpPortInputText = new JTextField();
+    private JTextField udpPortInputText = new JTextField();
+
     public LoginPanel() {
         setLayout(null);
         addAllComponents();
         initLoginFields();
         initErrorLabel();
         initButtons();
+        initPortConfiguration();
+    }
+
+    private void initPortConfiguration() {
+        tcpPort.setBounds(400,50,70,24);
+        udpPort.setBounds(400,74,70,24);
+
+        tcpPortInputText.setBounds(470,50,70,24);
+        udpPortInputText.setBounds(470,74,70,24);
+
+        tcpPortInputText.setText(String.valueOf(DaoProvider.getConnectionDAO().getTcpPort()));
+        udpPortInputText.setText(String.valueOf(DaoProvider.getConnectionDAO().getUdpPort()));
+
+        add(tcpPort);
+        add(udpPort);
+        add(tcpPortInputText);
+        add(udpPortInputText);
     }
 
     private void initButtons() {
@@ -115,5 +138,37 @@ public class LoginPanel extends JPanel{
 
     public JLabel getErrorMessage() {
         return errorMessage;
+    }
+
+    public JLabel getTcpPort() {
+        return tcpPort;
+    }
+
+    public void setTcpPort(JLabel tcpPort) {
+        this.tcpPort = tcpPort;
+    }
+
+    public JLabel getUdpPort() {
+        return udpPort;
+    }
+
+    public void setUdpPort(JLabel udpPort) {
+        this.udpPort = udpPort;
+    }
+
+    public JTextField getTcpPortInputText() {
+        return tcpPortInputText;
+    }
+
+    public void setTcpPortInputText(JTextField tcpPortInputText) {
+        this.tcpPortInputText = tcpPortInputText;
+    }
+
+    public JTextField getUdpPortInputText() {
+        return udpPortInputText;
+    }
+
+    public void setUdpPortInputText(JTextField udpPortInputText) {
+        this.udpPortInputText = udpPortInputText;
     }
 }

@@ -38,6 +38,8 @@ public class LoginButtonListener implements MouseListener {
     public void mousePressed(MouseEvent e) {
 
         if(validateDataSend()){
+            DaoProvider.getConnectionDAO().setTcpPort(Integer.parseInt(DaoProvider.getWindowDAO().getLoginPanel().getTcpPortInputText().getText()));
+            DaoProvider.getConnectionDAO().setUdpPort(Integer.parseInt(DaoProvider.getWindowDAO().getLoginPanel().getUdpPortInputText().getText()));
             try {
                 //TODO: close unused connection
                 Socket socketToServer = new Socket(connectionDAO.getServerIP(),connectionDAO.getServerPort());
