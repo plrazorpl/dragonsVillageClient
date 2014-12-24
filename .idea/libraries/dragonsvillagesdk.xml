@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="dragonsvillagesdk">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../uslugiSieciowe/SDK/dragonsvillagesdk/out/artifacts/dragonsvillagesdk_jar/dragonsvillagesdk.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

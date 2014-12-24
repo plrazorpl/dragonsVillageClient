@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="dragonsVillageClient:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/dragonsVillageClient_jar</output-path>
+    <root id="archive" name="dragonsVillageClient.jar">
+      <element id="module-output" name="dragonsVillageClient" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../uslugiSieciowe/SDK/dragonsvillagesdk/out/artifacts/dragonsvillagesdk_jar/dragonsvillagesdk.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
