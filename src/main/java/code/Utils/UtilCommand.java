@@ -8,7 +8,6 @@ import dragonsVillage.dtos.LoginUserDTO;
 import dragonsVillage.dtos.MapDTO;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class UtilCommand {
     public static void executeCommand(Object object){
@@ -21,9 +20,22 @@ public class UtilCommand {
             printOnConsole("add new player");
             printOnConsole("Actual user: " + DaoProvider.getLoggedUserDAO().getLoginUserDTO().getLogin());
             addNewPlayer((AddNewPlayerDatagram) object);
+        } else if(object instanceof ArrayList) {
+            //TODO: why serialization in datagram not working by net?
+            executeArrayListCommand((ArrayList) object);
         } else {
             //TODO: add no commend operation
             printOnConsole("Unknow command");
+        }
+    }
+
+    private static void executeArrayListCommand(ArrayList object) {
+        if(object.size()>0){
+            if(object.get(0) instanceof LoginUserDTO) {
+                initOtherPlayers(object);
+            }
+        } else {
+            printOnConsole("Empty simple data");
         }
     }
 
@@ -40,7 +52,7 @@ public class UtilCommand {
         MapDTO map = DaoProvider.getMapDAO().getMap();
         //TODO: refactor name
         int length = map.getMapPointTypes().length;
-        List<LoginUserDTO>[][] usersMap = new ArrayList[length][];
+        ArrayList<LoginUserDTO>[][] usersMap = new ArrayList[length][];
         for (int i=0;i<length;i++){
             int y = map.getMapPointTypes()[i].length;
             usersMap[i] = new ArrayList[y];
@@ -56,6 +68,15 @@ public class UtilCommand {
     private static void loadMap(FullCurrentMap map) {
         DaoProvider.getMapDAO().setMap(map.getMapDTO());
         initEmptyValue();
+    }
+
+    private static void initOtherPlayers(ArrayList<LoginUserDTO> usersOnMap) {
+        MapDTO map = DaoProvider.getMapDAO().getMap();
+        for (LoginUserDTO otherPlayer : usersOnMap) {
+            map.getUsersMap()[otherPlayer.getPositionX()][otherPlayer.getPositionY()].add(otherPlayer);
+            map.getUsersOnMap().add(otherPlayer);
+        }
+
     }
 
     private static void printOnConsole(String object) {
