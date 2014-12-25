@@ -9,6 +9,7 @@ import code.threads.ReciveTCPDataThread;
 import code.threads.ReciveUDPDataThread;
 import code.view.component.LoginPanel;
 import dragonsVillage.dtos.LoginUserDTO;
+import dragonsVillage.dtos.MapDTO;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -21,6 +22,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LoginButtonListener implements MouseListener {
 
@@ -60,6 +63,7 @@ public class LoginButtonListener implements MouseListener {
                         DaoProvider.getConnectionDAO().setPocket(pocket);
                         DaoProvider.getConnectionDAO().setUdpServer(udpServer);
                         sendUDPack(socketToServer);
+
                         startReciveThreads();
                         startGameWindow();
                     } else {

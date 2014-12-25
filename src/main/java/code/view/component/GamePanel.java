@@ -57,7 +57,7 @@ public class GamePanel extends JPanel {
 
             }
             try {
-                g.drawImage(getPlayerSkin(),playerPosition.x,playerPosition.y,null);
+                g.drawImage(getPlayerSkin(user),playerPosition.x,playerPosition.y,null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -87,6 +87,12 @@ public class GamePanel extends JPanel {
 
                     try {
                         g.drawImage(getMapImage(x-minX, y-minY), actualX, actualY, null);
+                        if(!map.getUsersMap()[x-minX][y-minY].isEmpty()){
+                            for (LoginUserDTO otherPlayer : map.getUsersMap()[x - minX][y - minY]) {
+                                g.drawImage(getPlayerSkin(otherPlayer),actualX,actualY,null);
+                            }
+
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -142,7 +148,7 @@ public class GamePanel extends JPanel {
         return new Point(middleWidth,middleHeight);
     }
 
-    public Image getPlayerSkin() throws IOException {
+    public Image getPlayerSkin(LoginUserDTO otherPlayer) throws IOException {
         if(playerSkin == null){
             File skinFile = new File(user.getSkin().getPath());
             if(!skinFile.exists()){
