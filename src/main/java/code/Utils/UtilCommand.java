@@ -4,6 +4,7 @@ import code.daos.MapDAO;
 import code.daos.basic.DaoProvider;
 import dragonsVillage.Datagrams.sendDatagram.AddNewPlayerDatagram;
 import dragonsVillage.Datagrams.sendDatagram.FullCurrentMap;
+import dragonsVillage.Datagrams.sendDatagram.PlayerLoggedOutDatagram;
 import dragonsVillage.dtos.LoginUserDTO;
 import dragonsVillage.dtos.MapDTO;
 
@@ -20,6 +21,8 @@ public class UtilCommand {
             printOnConsole("add new player");
             printOnConsole("Actual user: " + DaoProvider.getLoggedUserDAO().getLoginUserDTO().getLogin());
             addNewPlayer((AddNewPlayerDatagram) object);
+        } else if(object instanceof PlayerLoggedOutDatagram) {
+            removeOtherPlayer((PlayerLoggedOutDatagram) object);
         } else if(object instanceof ArrayList) {
             //TODO: why serialization in datagram not working by net?
             executeArrayListCommand((ArrayList) object);
@@ -29,10 +32,19 @@ public class UtilCommand {
         }
     }
 
+    private static void removeOtherPlayer(PlayerLoggedOutDatagram player) {
+        MapDTO map = DaoProvider.getMapDAO().getMap();
+        LoginUserDTO user = player.getUser();
+        map.getUsersMap()[user.getPositionX()][user.getPositionY()].remove(user);
+        map.getUsersOnMap().remove(user);
+    }
+
     private static void executeArrayListCommand(ArrayList object) {
         if(object.size()>0){
             if(object.get(0) instanceof LoginUserDTO) {
                 initOtherPlayers(object);
+            } else {
+                printOnConsole("Unknow simple data");
             }
         } else {
             printOnConsole("Empty simple data");
