@@ -1,8 +1,12 @@
 package code.Utils;
 
+import code.daos.basic.DaoProvider;
+import dragonsVillage.dtos.LoginUserDTO;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
 
 public class UtilData {
     public static Object deserializable(byte[] bytes, int length) throws IOException, ClassNotFoundException {
@@ -16,5 +20,23 @@ public class UtilData {
             result[i] = bytes[i];
         }
         return result;
+    }
+
+    public static LoginUserDTO getUserById(long userID) {
+        for (LoginUserDTO loginUserDTO : DaoProvider.getMapDAO().getMap().getUsersOnMap()) {
+            if(loginUserDTO.getId() == userID) {
+                return loginUserDTO;
+            }
+        }
+
+        return null;
+    }
+
+    public static ArrayList<LoginUserDTO> getUsersMapPoint(int x, int y) {
+        if(DaoProvider.getMapDAO().getMap().getUsersMap()[x][y] == null) {
+            DaoProvider.getMapDAO().getMap().getUsersMap()[x][y] = new ArrayList<>();
+        }
+
+        return DaoProvider.getMapDAO().getMap().getUsersMap()[x][y];
     }
 }

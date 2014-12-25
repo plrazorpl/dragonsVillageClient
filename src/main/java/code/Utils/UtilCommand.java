@@ -2,6 +2,7 @@ package code.Utils;
 
 import code.daos.MapDAO;
 import code.daos.basic.DaoProvider;
+import dragonsVillage.Datagrams.responseDatagram.ResponseUserMoveDatagram;
 import dragonsVillage.Datagrams.sendDatagram.AddNewPlayerDatagram;
 import dragonsVillage.Datagrams.sendDatagram.FullCurrentMap;
 import dragonsVillage.Datagrams.sendDatagram.PlayerLoggedOutDatagram;
@@ -23,6 +24,8 @@ public class UtilCommand {
             addNewPlayer((AddNewPlayerDatagram) object);
         } else if(object instanceof PlayerLoggedOutDatagram) {
             removeOtherPlayer((PlayerLoggedOutDatagram) object);
+        } else if(object instanceof ResponseUserMoveDatagram) {
+            moveUser((ResponseUserMoveDatagram) object);
         } else if(object instanceof ArrayList) {
             //TODO: why serialization in datagram not working by net?
             executeArrayListCommand((ArrayList) object);
@@ -30,6 +33,30 @@ public class UtilCommand {
             //TODO: add no commend operation
             printOnConsole("Unknow command");
         }
+    }
+
+    private static void moveUser(ResponseUserMoveDatagram userMoveDatagram) {
+        LoginUserDTO movedObject = null;
+
+        if(userMoveDatagram.getUserID() == DaoProvider.getLoggedUserDAO().getLoginUserDTO().getId()) {
+            movedObject = DaoProvider.getLoggedUserDAO().getLoginUserDTO();
+        } else {
+            movedObject = UtilData.getUserById(userMoveDatagram.getUserID());
+
+        }
+
+        ArrayList<LoginUserDTO> usersMapPoint = UtilData.getUsersMapPoint(movedObject.getPositionX(), movedObject.getPositionY());
+
+
+        movedObject.setPositionX(userMoveDatagram.getX());
+        movedObject.setPositionY(userMoveDatagram.getY());
+
+        usersMapPoint.remove(movedObject);
+
+        usersMapPoint = UtilData.getUsersMapPoint(movedObject.getPositionX(), movedObject.getPositionY());
+
+        usersMapPoint.add(movedObject);
+
     }
 
     private static void removeOtherPlayer(PlayerLoggedOutDatagram player) {
