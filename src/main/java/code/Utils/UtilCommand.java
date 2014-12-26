@@ -1,10 +1,9 @@
 package code.Utils;
 
 import code.daos.basic.DaoProvider;
-import dragonsVillage.Datagrams.responseDatagram.ResponseUserMoveDatagram;
-import dragonsVillage.Datagrams.sendDatagram.AddNewPlayerDatagram;
+import dragonsVillage.Datagrams.responseDatagram.*;
+import dragonsVillage.Datagrams.sendDatagram.*;
 import dragonsVillage.Datagrams.sendDatagram.FullCurrentMap;
-import dragonsVillage.Datagrams.sendDatagram.PlayerLoggedOutDatagram;
 import dragonsVillage.dtos.LoginUserDTO;
 import dragonsVillage.dtos.MapDTO;
 
@@ -31,14 +30,14 @@ public class UtilCommand {
         } else if(object instanceof FullCurrentMap) {
             printOnConsole("getted full map");
             loadMap((FullCurrentMap) object);
-        } else if(object instanceof AddNewPlayerDatagram) {
+        } else if(object instanceof AddNewPlayerToUserDatagram) {
             printOnConsole("add new player");
             printOnConsole("Actual user: " + DaoProvider.getLoggedUserDAO().getLoginUserDTO().getLogin());
-            addNewPlayer((AddNewPlayerDatagram) object);
-        } else if(object instanceof PlayerLoggedOutDatagram) {
-            removeOtherPlayer((PlayerLoggedOutDatagram) object);
-        } else if(object instanceof ResponseUserMoveDatagram) {
-            moveUser((ResponseUserMoveDatagram) object);
+            addNewPlayer((AddNewPlayerToUserDatagram) object);
+        } else if(object instanceof PlayerLoggedOutToUserDatagram) {
+            removeOtherPlayer((PlayerLoggedOutToUserDatagram) object);
+        } else if(object instanceof ResponseUserMoveToUserDatagram) {
+            moveUser((ResponseUserMoveToUserDatagram) object);
         } else if(object instanceof ArrayList) {
             //TODO: why serialization in datagram not working by net?
             executeArrayListCommand((ArrayList) object);
@@ -49,7 +48,7 @@ public class UtilCommand {
         mutex.put(avaliableAction);
     }
 
-    private static void moveUser(ResponseUserMoveDatagram userMoveDatagram) {
+    private static void moveUser(ResponseUserMoveToUserDatagram userMoveDatagram) {
         LoginUserDTO movedObject = null;
 
         if(userMoveDatagram.getUserID() == DaoProvider.getLoggedUserDAO().getLoginUserDTO().getId()) {
@@ -73,7 +72,7 @@ public class UtilCommand {
 
     }
 
-    private static void removeOtherPlayer(PlayerLoggedOutDatagram player) {
+    private static void removeOtherPlayer(PlayerLoggedOutToUserDatagram player) {
         MapDTO map = DaoProvider.getMapDAO().getMap();
         LoginUserDTO user = player.getUser();
         map.getUsersMap()[user.getPositionX()][user.getPositionY()].remove(user);
@@ -92,7 +91,7 @@ public class UtilCommand {
         }
     }
 
-    private static void addNewPlayer(AddNewPlayerDatagram newPlayer) {
+    private static void addNewPlayer(AddNewPlayerToUserDatagram newPlayer) {
         MapDTO mapDTO = DaoProvider.getMapDAO().getMap();
         LoginUserDTO loginUserDTO = newPlayer.getLoginUserDTO();
         mapDTO.getUsersOnMap().add(loginUserDTO);
