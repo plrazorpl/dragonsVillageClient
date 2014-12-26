@@ -2,6 +2,7 @@ package code.listeners;
 
 import code.Utils.UtilConnection;
 import code.daos.basic.DaoProvider;
+import code.threads.SelfBlockActionThread;
 import dragonsVillage.Datagrams.requestDatagram.*;
 import dragonsVillage.Enums.EMoveSide;
 import dragonsVillage.dtos.LoginUserDTO;
@@ -13,7 +14,7 @@ import java.io.IOException;
 public class GameButtonsListener implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
-        if (DaoProvider.getEngineDAO().isActionAvaliable()) {
+        if (DaoProvider.getEngineDAO().isActionAvaliable() && DaoProvider.getEngineDAO().isSelfNotBlockCommand()) {
             LoginUserDTO loginUserDTO = DaoProvider.getLoggedUserDAO().getLoginUserDTO();
             try {
                 if (e.getKeyChar() == 'D' || e.getKeyChar() == 'd') {
@@ -25,6 +26,9 @@ public class GameButtonsListener implements KeyListener {
                 } else if (e.getKeyChar() == 'W' || e.getKeyChar() == 'w') {
                     UtilConnection.sendObject(new RequestMoveFromUserDatagram(loginUserDTO, EMoveSide.UP));
                 }
+
+                Thread lockThread = new SelfBlockActionThread(300);
+                lockThread.start();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

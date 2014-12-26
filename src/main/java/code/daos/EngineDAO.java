@@ -14,6 +14,7 @@ public class EngineDAO {
     private RepainterThreadV2 repainterThreadV2;
     private ScheduledFuture<?> graphicThread;
     private boolean actionAvaliable = true;
+    private boolean selfNotBlockCommand = true;
 
     public boolean isNotEnd() {
         return notEnd;
@@ -53,5 +54,13 @@ public class EngineDAO {
 
     public void setActionAvaliable(boolean actionAvaliable) {
         this.actionAvaliable = actionAvaliable;
+    }
+
+    public boolean isSelfNotBlockCommand() {
+        return selfNotBlockCommand;
+    }
+
+    public void setSelfNotBlockCommand(boolean selfNotBlockCommand) {
+        this.selfNotBlockCommand = selfNotBlockCommand;
     }
 }
