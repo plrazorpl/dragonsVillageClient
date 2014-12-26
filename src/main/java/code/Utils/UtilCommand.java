@@ -1,6 +1,7 @@
 package code.Utils;
 
 import code.daos.basic.DaoProvider;
+import code.threads.MoveUserThread;
 import dragonsVillage.Datagrams.responseDatagram.*;
 import dragonsVillage.Datagrams.sendDatagram.*;
 import dragonsVillage.Datagrams.sendDatagram.FullCurrentMap;
@@ -28,11 +29,8 @@ public class UtilCommand {
         if(object instanceof String){
             printOnConsole((String) object);
         } else if(object instanceof FullCurrentMap) {
-            printOnConsole("getted full map");
             loadMap((FullCurrentMap) object);
         } else if(object instanceof AddNewPlayerToUserDatagram) {
-            printOnConsole("add new player");
-            printOnConsole("Actual user: " + DaoProvider.getLoggedUserDAO().getLoginUserDTO().getLogin());
             addNewPlayer((AddNewPlayerToUserDatagram) object);
         } else if(object instanceof PlayerLoggedOutToUserDatagram) {
             removeOtherPlayer((PlayerLoggedOutToUserDatagram) object);
@@ -53,22 +51,25 @@ public class UtilCommand {
 
         if(userMoveDatagram.getUserID() == DaoProvider.getLoggedUserDAO().getLoginUserDTO().getId()) {
             movedObject = DaoProvider.getLoggedUserDAO().getLoginUserDTO();
+            DaoProvider.getEngineDAO().setActionAvaliable(false);
         } else {
             movedObject = UtilData.getUserById(userMoveDatagram.getUserID());
 
         }
 
-        ArrayList<LoginUserDTO> usersMapPoint = UtilData.getUsersMapPoint(movedObject.getPositionX(), movedObject.getPositionY());
+        new MoveUserThread(movedObject, userMoveDatagram.getX(),userMoveDatagram.getY());
 
-
-        movedObject.setPositionX(userMoveDatagram.getX());
-        movedObject.setPositionY(userMoveDatagram.getY());
-
-        usersMapPoint.remove(movedObject);
-
-        usersMapPoint = UtilData.getUsersMapPoint(movedObject.getPositionX(), movedObject.getPositionY());
-
-        usersMapPoint.add(movedObject);
+//        ArrayList<LoginUserDTO> usersMapPoint = UtilData.getUsersMapPoint(movedObject.getPositionX(), movedObject.getPositionY());
+//
+//
+//        movedObject.setPositionX(userMoveDatagram.getX());
+//        movedObject.setPositionY(userMoveDatagram.getY());
+//
+//        usersMapPoint.remove(movedObject);
+//
+//        usersMapPoint = UtilData.getUsersMapPoint(movedObject.getPositionX(), movedObject.getPositionY());
+//
+//        usersMapPoint.add(movedObject);
 
     }
 

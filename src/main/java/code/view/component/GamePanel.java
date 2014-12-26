@@ -72,7 +72,6 @@ public class GamePanel extends JPanel {
         int y = user.getPositionY();
 
 
-
         int minX = 0;
         int minY = 0;
 
@@ -84,15 +83,40 @@ public class GamePanel extends JPanel {
         for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH){
             for(int actualY = playerPosition.y-minY*HEIGHT;actualY<height+HEIGHT;actualY+=HEIGHT) {
                 if(isCorrectPosition(x-minX,y-minY)) {
-                    g.drawOval(actualX - user.getActualSharpX(), actualY - user.getActualSharpY(), WIDTH, HEIGHT);
 
                     try {
-                        g.drawImage(getMapImage(x-minX, y-minY), actualX, actualY, null);
-                        if(!map.getUsersMap()[x-minX][y-minY].isEmpty()){
-                            for (LoginUserDTO otherPlayer : map.getUsersMap()[x - minX][y - minY]) {
-                                g.drawImage(getPlayerSkin(otherPlayer),actualX,actualY,null);
-                            }
+                        g.drawImage(getMapImage(x-minX, y-minY), actualX+user.getActualSharpX(), actualY+user.getActualSharpY(), null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                y++;
+            }
+            y=user.getPositionY();
+            x++;
+        }
 
+
+        x = user.getPositionX();
+        y = user.getPositionY();
+
+
+        minX = 0;
+        minY = 0;
+
+        g.setColor(Color.BLUE);
+
+        for(;playerPosition.x-minX*WIDTH>0;minX++){}
+        for(;playerPosition.y-minY*HEIGHT>0;minY++){}
+
+        for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH){
+            for(int actualY = playerPosition.y-minY*HEIGHT;actualY<height+HEIGHT;actualY+=HEIGHT) {
+                if(isCorrectPosition(x-minX,y-minY) && !map.getUsersMap()[x-minX][y-minY].isEmpty()) {
+                    try {
+                        for (LoginUserDTO otherPlayer : map.getUsersMap()[x - minX][y - minY]) {
+                            if(otherPlayer.getId() != user.getId()) {
+                                g.drawImage(getPlayerSkin(otherPlayer), actualX + user.getActualSharpX() - otherPlayer.getActualSharpX(), actualY + user.getActualSharpY() - otherPlayer.getActualSharpY(), null);
+                            }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();

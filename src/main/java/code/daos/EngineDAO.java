@@ -13,6 +13,7 @@ public class EngineDAO {
     private int actualFrameRate;
     private RepainterThreadV2 repainterThreadV2;
     private ScheduledFuture<?> graphicThread;
+    private boolean actionAvaliable = true;
 
     public boolean isNotEnd() {
         return notEnd;
@@ -44,5 +45,13 @@ public class EngineDAO {
 
     public void setGraphicThread(ScheduledFuture<?> graphicThread) {
         this.graphicThread = graphicThread;
+    }
+
+    public boolean isActionAvaliable() {
+        return actionAvaliable;
+    }
+
+    public void setActionAvaliable(boolean actionAvaliable) {
+        this.actionAvaliable = actionAvaliable;
     }
 }
