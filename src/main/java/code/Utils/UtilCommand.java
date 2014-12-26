@@ -1,6 +1,5 @@
 package code.Utils;
 
-import code.daos.MapDAO;
 import code.daos.basic.DaoProvider;
 import dragonsVillage.Datagrams.responseDatagram.ResponseUserMoveDatagram;
 import dragonsVillage.Datagrams.sendDatagram.AddNewPlayerDatagram;
@@ -10,9 +9,23 @@ import dragonsVillage.dtos.LoginUserDTO;
 import dragonsVillage.dtos.MapDTO;
 
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class UtilCommand {
-    public static void executeCommand(Object object){
+    private static BlockingQueue mutex = new ArrayBlockingQueue(1);
+    private static Object avaliableAction = new Object();
+
+    static {
+        try {
+            mutex.put(avaliableAction);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void executeCommand(Object object) throws InterruptedException {
+        mutex.take();
         if(object instanceof String){
             printOnConsole((String) object);
         } else if(object instanceof FullCurrentMap) {
@@ -33,6 +46,7 @@ public class UtilCommand {
             //TODO: add no commend operation
             printOnConsole("Unknow command");
         }
+        mutex.put(avaliableAction);
     }
 
     private static void moveUser(ResponseUserMoveDatagram userMoveDatagram) {

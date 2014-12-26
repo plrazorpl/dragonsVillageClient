@@ -25,6 +25,8 @@ public class ReciveTCPDataThread extends Thread {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
