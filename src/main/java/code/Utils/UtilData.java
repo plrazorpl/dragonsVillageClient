@@ -48,4 +48,10 @@ public class UtilData {
         }
         return dragonsMap[x][y];
     }
+
+    public static void addDragonIfNotExist(int x, int y, DragonDTO dragon) {
+        if(!UtilData.getDragonMap(x, y).contains(dragon)) {
+            UtilData.getDragonMap(x, y).add(dragon);
+        }
+    }
 }

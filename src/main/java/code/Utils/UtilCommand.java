@@ -40,7 +40,7 @@ public class UtilCommand {
         } else if(object instanceof ResponseUserMoveToUserDatagram) {
             moveUser((ResponseUserMoveToUserDatagram) object);
         } else if(object instanceof AddDragonsDatagram) {
-            addDragonsMap((AddDragonsDatagram) object);
+            addDragonsMap(((AddDragonsDatagram) object).getDragonDTO());
         } else if(object instanceof ArrayList) {
             //TODO: why serialization in datagram not working by net?
             executeArrayListCommand((ArrayList) object);
@@ -53,15 +53,23 @@ public class UtilCommand {
         mutex.put(avaliableAction);
     }
 
-    private static void addDragonsMap(AddDragonsDatagram dragonsDatagram) {
+    //    private static void executeHashMapCommand(HashMap object) {
+//        if(object.keySet().toArray().length>0 && object.keySet().toArray()[0] instanceof Long) {
+//            if(object.values().toArray().length>0 && object.values().toArray()[0] instanceof DragonDTO) {
+//                addDragonsMap(object);
+//            }
+//        }
+
+    private static void addDragonsMap(Object[] dragonsDatagram) {
         MapDTO map = DaoProvider.getMapDAO().getMap();
         HashMap<Long, DragonDTO> dragonsDTO = map.getDragonsDTO();
-        for (Object object : dragonsDatagram.getDragonDTO()) {
+        for (Object object : dragonsDatagram) {
             DragonDTO dragon = (DragonDTO) object;
-            dragonsDTO.put(dragon.getId(),dragon);
+            dragonsDTO.put(dragon.getId(), dragon);
             for(int i=0;i<dragon.getDragonType().getSize();i++) {
                 for(int j=0;j<dragon.getDragonType().getSize();j++) {
-                    UtilData.getDragonMap(i,j).add(dragon);
+                    UtilData.addDragonIfNotExist(i+dragon.getPositionX(),j+dragon.getPositionY(),dragon);
+
                 }
             }
         }
@@ -71,34 +79,15 @@ public class UtilCommand {
     private static void executeArrayCommand(Object[] object) {
         if(object.length>0) {
             if(object[0] instanceof DragonDTO) {
+                HashMap<Long, DragonDTO> hashMap = new HashMap<>();
+                DaoProvider.getMapDAO().getMap().setDragonsDTO(hashMap);
                 addDragonsMap(object);
             }
         }
         //TODO: exception
     }
 
-//    private static void executeHashMapCommand(HashMap object) {
-//        if(object.keySet().toArray().length>0 && object.keySet().toArray()[0] instanceof Long) {
-//            if(object.values().toArray().length>0 && object.values().toArray()[0] instanceof DragonDTO) {
-//                addDragonsMap(object);
-//            }
-//        }
 //    }
-
-    private static void addDragonsMap(Object[] dragonsHashMap) {
-        MapDTO map = DaoProvider.getMapDAO().getMap();
-        HashMap<Long, DragonDTO> hashMap = new HashMap<>();
-        for (Object dragonDTO : dragonsHashMap) {
-            DragonDTO dragon = (DragonDTO) dragonDTO;
-            hashMap.put(dragon.getId(),dragon);
-            for(int i=0;i<dragon.getDragonType().getSize();i++) {
-                for(int j=0;j<dragon.getDragonType().getSize();j++) {
-                    UtilData.getDragonMap(i+dragon.getPositionX(),j+dragon.getPositionY()).add(dragon);
-                }
-            }
-        }
-        map.setDragonsDTO(hashMap);
-    }
 
     private static void executeArrayListCommand(ArrayList object) {
         if(object.size()>0){
@@ -132,6 +121,16 @@ public class UtilCommand {
         LoginUserDTO user = player.getUser();
         map.getUsersMap()[user.getPositionX()][user.getPositionY()].remove(user);
         map.getUsersOnMap().remove(user);
+
+        for (Long dragonID : user.getDragonsElements()) {
+            DragonDTO dragon = map.getDragonsDTO().remove(dragonID);
+            for(int i=0;i<dragon.getDragonType().getSize();i++) {
+                for(int j=0;j<dragon.getDragonType().getSize();j++) {
+                    UtilData.getDragonMap(i+dragon.getPositionX(),j+dragon.getPositionY()).remove(dragon);
+                }
+            }
+        }
+
     }
 
     private static void addNewPlayer(AddNewPlayerToUserDatagram newPlayer) {
