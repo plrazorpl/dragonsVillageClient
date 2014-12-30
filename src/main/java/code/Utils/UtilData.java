@@ -1,6 +1,7 @@
 package code.Utils;
 
 import code.daos.basic.DaoProvider;
+import dragonsVillage.dtos.DragonDTO;
 import dragonsVillage.dtos.LoginUserDTO;
 
 import java.io.ByteArrayInputStream;
@@ -38,5 +39,13 @@ public class UtilData {
         }
 
         return DaoProvider.getMapDAO().getMap().getUsersMap()[x][y];
+    }
+
+    public static ArrayList<DragonDTO> getDragonMap(int x, int y) {
+        ArrayList<DragonDTO>[][] dragonsMap = DaoProvider.getMapDAO().getMap().getDragonsMap();
+        if(dragonsMap[x][y] == null) {
+            dragonsMap[x][y] = new ArrayList<>();
+        }
+        return dragonsMap[x][y];
     }
 }

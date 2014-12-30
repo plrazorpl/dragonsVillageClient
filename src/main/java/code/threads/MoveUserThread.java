@@ -34,7 +34,7 @@ public class MoveUserThread implements Runnable {
         currentY = 0;
 
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(this, 0, (long) (900/STEPS_COUNT), MILLISECONDS);
+        scheduler.scheduleAtFixedRate(this, 0, (long) (1000/STEPS_COUNT), MILLISECONDS);
     }
 
     @Override

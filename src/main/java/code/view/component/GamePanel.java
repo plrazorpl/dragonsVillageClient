@@ -1,12 +1,15 @@
 package code.view.component;
 
+import code.Utils.UtilData;
 import code.daos.LoggedUserDAO;
 import code.daos.MapDAO;
 import code.daos.WindowDAO;
 import code.daos.basic.DaoProvider;
+import dragonsVillage.Enums.EDragonType;
 import dragonsVillage.Enums.EMapPointType;
 import dragonsVillage.Enums.EMapType;
 import dragonsVillage.Enums.EPlayerSkin;
+import dragonsVillage.dtos.DragonDTO;
 import dragonsVillage.dtos.LoginUserDTO;
 import dragonsVillage.dtos.MapDTO;
 
@@ -36,6 +39,9 @@ public class GamePanel extends JPanel {
     private Image playerSkin;
     private Map<EMapPointType,Image> mapImages;
 
+    private long timeStamp = 0;
+    private int frameCount = 0;
+
     public GamePanel(){
         width = windowDAO.getGameWindowWidth();
         height = windowDAO.getGameWindowHeight();
@@ -50,6 +56,10 @@ public class GamePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        if(timeStamp == 0) {
+            timeStamp = System.currentTimeMillis();
+        }
         if((user = userDAO.getLoginUserDTO()) !=null){
             Point playerPosition = getCentralPoint(user);
             if((map = mapDAO.getMap())!=null){
@@ -64,6 +74,14 @@ public class GamePanel extends JPanel {
             }
 //            g.setColor(Color.GREEN);
 //            g.fillOval(playerPosition.x,playerPosition.y, WIDTH, HEIGHT);
+        }
+
+        frameCount++;
+        if(System.currentTimeMillis() - timeStamp > 1000) {
+            System.out.println("FPS: " + frameCount);
+            frameCount = 0;
+            timeStamp = 0;
+
         }
     }
 
@@ -96,18 +114,36 @@ public class GamePanel extends JPanel {
             x++;
         }
 
+        x = user.getPositionX();
+        y = user.getPositionY();
+
+
+        g.setColor(Color.BLUE);
+
+        for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH) {
+            for (int actualY = playerPosition.y - minY * HEIGHT; actualY < height + HEIGHT; actualY += HEIGHT) {
+                if (isCorrectPosition(x - minX, y - minY) && !UtilData.getDragonMap(x - minX,y - minY).isEmpty()) {
+                    try {
+                        for (DragonDTO dragonDTO : map.getDragonsMap()[x - minX][y - minY]) {
+                            g.drawImage(getDragonSkin(dragonDTO), actualX + user.getActualSharpX() - dragonDTO.getActualSharpX(), actualY + user.getActualSharpY() - dragonDTO.getActualSharpY(),null);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                y++;
+            }
+            y=user.getPositionY();
+            x++;
+        }
+
 
         x = user.getPositionX();
         y = user.getPositionY();
 
 
-        minX = 0;
-        minY = 0;
-
         g.setColor(Color.BLUE);
 
-        for(;playerPosition.x-minX*WIDTH>0;minX++){}
-        for(;playerPosition.y-minY*HEIGHT>0;minY++){}
 
         for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH){
             for(int actualY = playerPosition.y-minY*HEIGHT;actualY<height+HEIGHT;actualY+=HEIGHT) {
@@ -127,6 +163,19 @@ public class GamePanel extends JPanel {
             y=user.getPositionY();
             x++;
         }
+    }
+
+    private Image getDragonSkin(DragonDTO dragonDTO) throws IOException {
+        if(dragonDTO.getDragonSkin() == null){
+            File skinFile = new File(dragonDTO.getDragonType().getPath());
+            if(!skinFile.exists()){
+                ClassLoader classLoader = getClass().getClassLoader();
+                skinFile = new File(classLoader.getResource(EDragonType.DEFAULT.getPath()).getFile());
+            }
+            BufferedImage readed = ImageIO.read(skinFile);
+            dragonDTO.setDragonSkin(readed.getScaledInstance(WIDTH,HEIGHT,Image.SCALE_SMOOTH));
+        }
+        return dragonDTO.getDragonSkin();
     }
 
     private Image getMapImage(int x, int y) throws IOException {
