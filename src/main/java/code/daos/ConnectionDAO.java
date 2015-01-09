@@ -11,7 +11,7 @@ import java.net.Socket;
 import code.threads.ReciveUDPDataThread;
 
 public class ConnectionDAO {
-    private static final String IP_ADDRESS = "25.166.5.129";
+    private static final String IP_ADDRESS = "127.0.0.1";    //"25.166.5.129";
     private static final int SERVER_PORT = 12000;
     private static final int SELF_TCP_PORT = 13000;
     private static final int SELF_UDP_PORT = 14000;
