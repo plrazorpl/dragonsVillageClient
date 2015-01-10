@@ -127,7 +127,7 @@ public class UtilCommand {
 
         }
 
-        new MoveUserThread(movedObject, userMoveDatagram.getX(),userMoveDatagram.getY());
+        new MoveUserThread(movedObject, userMoveDatagram.getX(),userMoveDatagram.getY(), userMoveDatagram.getMoveSide());
 
     }
 

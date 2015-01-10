@@ -2,6 +2,7 @@ package code.threads;
 
 import code.Utils.UtilData;
 import code.daos.basic.DaoProvider;
+import dragonsVillage.Enums.EMoveSide;
 import dragonsVillage.dtos.LoginUserDTO;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class MoveUserThread implements Runnable {
     private int actualStep = 0;
     private ScheduledExecutorService scheduler;
 
-    public MoveUserThread(LoginUserDTO userDTO, int toX, int toY) {
+    public MoveUserThread(LoginUserDTO userDTO, int toX, int toY, EMoveSide moveSide) {
         this.userDTO = userDTO;
         this.toX = toX;
         this.toY = toY;
@@ -33,6 +34,8 @@ public class MoveUserThread implements Runnable {
         currentX = 0;
         currentY = 0;
 
+        userDTO.setMoveSide(moveSide);
+        userDTO.setPlayerSkin(null);
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(this, 0, (long) (1000/STEPS_COUNT), MILLISECONDS);
     }

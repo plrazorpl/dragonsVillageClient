@@ -33,7 +33,7 @@ public class GamePanel extends JPanel {
     private LoginUserDTO user;
     private MapDTO map;
 
-    private Image playerSkin;
+
     private Map<EMapPointType,Image> mapImages;
 
     private long timeStamp = 0;
@@ -215,20 +215,33 @@ public class GamePanel extends JPanel {
     }
 
     public Image getPlayerSkin(LoginUserDTO otherPlayer) throws IOException {
-        if(playerSkin == null){
-            File skinFile = new File(user.getSkin().getPath());
+        if(otherPlayer.getPlayerSkin() == null){
+            File skinFile = null;
+            if(otherPlayer.getMoveSide()==null || otherPlayer.getMoveSide() == EMoveSide.DOWN) {
+                skinFile = new File(user.getSkin().getDown());
+            } else if(otherPlayer.getMoveSide() == EMoveSide.UP) {
+                skinFile = new File(user.getSkin().getUp());
+            } else if(otherPlayer.getMoveSide() == EMoveSide.LEFT) {
+                skinFile = new File(user.getSkin().getLeft());
+            } else if(otherPlayer.getMoveSide() == EMoveSide.RIGHT) {
+                skinFile = new File(user.getSkin().getRight());
+            }
             if(!skinFile.exists()){
                 ClassLoader classLoader = getClass().getClassLoader();
-                skinFile = new File(classLoader.getResource(EPlayerSkin.DEFAULT.getPath()).getFile());
+                if(otherPlayer.getMoveSide()==null || otherPlayer.getMoveSide() == EMoveSide.DOWN) {
+                    skinFile = new File(classLoader.getResource(otherPlayer.getSkin().getDown()).getFile());
+                } else if(otherPlayer.getMoveSide() == EMoveSide.UP) {
+                    skinFile = new File(classLoader.getResource(otherPlayer.getSkin().getUp()).getFile());
+                } else if(otherPlayer.getMoveSide() == EMoveSide.LEFT) {
+                    skinFile = new File(classLoader.getResource(otherPlayer.getSkin().getLeft()).getFile());
+                } else if(otherPlayer.getMoveSide() == EMoveSide.RIGHT) {
+                    skinFile = new File(classLoader.getResource(otherPlayer.getSkin().getRight()).getFile());
+                }
             }
             BufferedImage readed = ImageIO.read(skinFile);
-            playerSkin = readed.getScaledInstance(WIDTH,HEIGHT,Image.SCALE_SMOOTH);
+            otherPlayer.setPlayerSkin(readed.getScaledInstance(WIDTH,HEIGHT,Image.SCALE_SMOOTH));
         }
-        return playerSkin;
-    }
-
-    public void setPlayerSkin(Image playerSkin) {
-        this.playerSkin = playerSkin;
+        return otherPlayer.getPlayerSkin();
     }
 
     public MapDTO getMap() {
