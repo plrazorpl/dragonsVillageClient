@@ -1,11 +1,12 @@
 package code.Utils;
 
 import code.daos.basic.DaoProvider;
+import code.threads.DragonMoveAnimationTherad;
+import code.threads.DragonMoveThread;
 import code.threads.MoveUserThread;
 import dragonsVillage.Datagrams.responseDatagram.*;
 import dragonsVillage.Datagrams.sendDatagram.*;
 import dragonsVillage.Datagrams.sendDatagram.FullCurrentMap;
-import dragonsVillage.Enums.EMapPointType;
 import dragonsVillage.dtos.DragonDTO;
 import dragonsVillage.dtos.LoginUserDTO;
 import dragonsVillage.dtos.MapDTO;
@@ -40,17 +41,23 @@ public class UtilCommand {
         } else if(object instanceof ResponseUserMoveToUserDatagram) {
             moveUser((ResponseUserMoveToUserDatagram) object);
         } else if(object instanceof AddDragonsDatagram) {
-            addDragonsMap(((AddDragonsDatagram) object).getDragonDTO());
+            addDragonsMap(((AddDragonsDatagram) object).getDragonDTO());  //another user dragons
         } else if(object instanceof ArrayList) {
             //TODO: why serialization in datagram not working by net?
             executeArrayListCommand((ArrayList) object);
         } else if(object instanceof Object[]) {
             executeArrayCommand((Object[]) object);
+        } else if(object instanceof ResponseMoveDragonDatagram) {
+            moveDragon((ResponseMoveDragonDatagram) object);
         } else {
             //TODO: add no commend operation
             printOnConsole("Unknow command");
         }
         mutex.put(avaliableAction);
+    }
+
+    private static void moveDragon(ResponseMoveDragonDatagram object) {
+        new DragonMoveAnimationTherad(object);
     }
 
     //    private static void executeHashMapCommand(HashMap object) {
@@ -78,16 +85,24 @@ public class UtilCommand {
 
     private static void executeArrayCommand(Object[] object) {
         if(object.length>0) {
-            if(object[0] instanceof DragonDTO) {
+            if(object[0] instanceof DragonDTO) { //logged user dragons
                 HashMap<Long, DragonDTO> hashMap = new HashMap<>();
                 DaoProvider.getMapDAO().getMap().setDragonsDTO(hashMap);
                 addDragonsMap(object);
+                startDragonMoveThreads();
             }
         }
         //TODO: exception
     }
 
-//    }
+    private static void startDragonMoveThreads() {
+        ArrayList<Long> dragonsElements = DaoProvider.getLoggedUserDAO().getLoginUserDTO().getDragonsElements();
+        for (Long dragonsElement : dragonsElements) {
+            DragonDTO dragonDTO = DaoProvider.getMapDAO().getMap().getDragonsDTO().get(dragonsElement);
+            DaoProvider.getEngineDAO().getDragonThreadMap().put(dragonDTO.getId(), new DragonMoveThread(dragonDTO));
+        }
+
+    }
 
     private static void executeArrayListCommand(ArrayList object) {
         if(object.size()>0){

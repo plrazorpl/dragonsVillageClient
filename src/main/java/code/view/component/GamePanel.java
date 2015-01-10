@@ -5,10 +5,7 @@ import code.daos.LoggedUserDAO;
 import code.daos.MapDAO;
 import code.daos.WindowDAO;
 import code.daos.basic.DaoProvider;
-import dragonsVillage.Enums.EDragonType;
-import dragonsVillage.Enums.EMapPointType;
-import dragonsVillage.Enums.EMapType;
-import dragonsVillage.Enums.EPlayerSkin;
+import dragonsVillage.Enums.*;
 import dragonsVillage.dtos.DragonDTO;
 import dragonsVillage.dtos.LoginUserDTO;
 import dragonsVillage.dtos.MapDTO;
@@ -100,7 +97,7 @@ public class GamePanel extends JPanel {
 
         for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH){
             for(int actualY = playerPosition.y-minY*HEIGHT;actualY<height+HEIGHT;actualY+=HEIGHT) {
-                if(isCorrectPosition(x-minX,y-minY)) {
+                if(UtilData.isCorrectPosition(x-minX,y-minY)) {
 
                     try {
                         g.drawImage(getMapImage(x-minX, y-minY), actualX+user.getActualSharpX(), actualY+user.getActualSharpY(), null);
@@ -122,7 +119,7 @@ public class GamePanel extends JPanel {
 
         for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH) {
             for (int actualY = playerPosition.y - minY * HEIGHT; actualY < height + HEIGHT; actualY += HEIGHT) {
-                if (isCorrectPosition(x - minX, y - minY) && !UtilData.getDragonMap(x - minX,y - minY).isEmpty()) {
+                if (UtilData.isCorrectPosition(x - minX, y - minY) && !UtilData.getDragonMap(x - minX,y - minY).isEmpty()) {
                     try {
                         for (DragonDTO dragonDTO : map.getDragonsMap()[x - minX][y - minY]) {
                             g.drawImage(getDragonSkin(dragonDTO), actualX + user.getActualSharpX() - dragonDTO.getActualSharpX(), actualY + user.getActualSharpY() - dragonDTO.getActualSharpY(),null);
@@ -147,7 +144,7 @@ public class GamePanel extends JPanel {
 
         for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH){
             for(int actualY = playerPosition.y-minY*HEIGHT;actualY<height+HEIGHT;actualY+=HEIGHT) {
-                if(isCorrectPosition(x-minX,y-minY) && !map.getUsersMap()[x-minX][y-minY].isEmpty()) {
+                if(UtilData.isCorrectPosition(x - minX, y - minY) && !map.getUsersMap()[x-minX][y-minY].isEmpty()) {
                     try {
                         for (LoginUserDTO otherPlayer : map.getUsersMap()[x - minX][y - minY]) {
                             if(otherPlayer.getId() != user.getId()) {
@@ -167,10 +164,19 @@ public class GamePanel extends JPanel {
 
     private Image getDragonSkin(DragonDTO dragonDTO) throws IOException {
         if(dragonDTO.getDragonSkin() == null){
-            File skinFile = new File(dragonDTO.getDragonType().getLeft());
+            File skinFile = null;
+            if(dragonDTO.getMoveSide() == null || dragonDTO.getMoveSide() == EMoveSide.LEFT) {
+                skinFile = new File(dragonDTO.getDragonType().getLeft());
+            } else if(dragonDTO.getMoveSide() == EMoveSide.RIGHT) {
+                skinFile = new File(dragonDTO.getDragonType().getRight());
+            }
             if(!skinFile.exists()){
                 ClassLoader classLoader = getClass().getClassLoader();
-                skinFile = new File(classLoader.getResource(dragonDTO.getDragonType().getLeft()).getFile());
+                if(dragonDTO.getMoveSide() == null || dragonDTO.getMoveSide() == EMoveSide.LEFT) {
+                    skinFile = new File(classLoader.getResource(dragonDTO.getDragonType().getLeft()).getFile());
+                } else if(dragonDTO.getMoveSide() == EMoveSide.RIGHT) {
+                    skinFile = new File(classLoader.getResource(dragonDTO.getDragonType().getRight()).getFile());
+                }
             }
             BufferedImage readed = ImageIO.read(skinFile);
             dragonDTO.setDragonSkin(readed.getScaledInstance(WIDTH,HEIGHT,Image.SCALE_SMOOTH));
@@ -199,21 +205,7 @@ public class GamePanel extends JPanel {
         return mapImages.get(mapPointType);
     }
 
-    private boolean isCorrectPosition(int x, int y){
-        if(x >= map.getMapPointTypes().length || x < 0) {
-            return false;
-        }
 
-        if(y >= map.getMapPointTypes()[x].length || y < 0) {
-            return false;
-        }
-
-        if(map.getMapPointTypes()[x][y] == null) {
-            return false;
-        }
-
-        return true;
-    }
 
     private Point getCentralPoint(LoginUserDTO user) {
         int middleWidth = width/2 - WIDTH/2;

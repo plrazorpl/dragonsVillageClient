@@ -1,8 +1,11 @@
 package code.daos;
 
 
+import code.threads.DragonMoveThread;
 import code.threads.RepainterThreadV2;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 
 public class EngineDAO {
@@ -15,6 +18,7 @@ public class EngineDAO {
     private ScheduledFuture<?> graphicThread;
     private boolean actionAvaliable = true;
     private boolean selfNotBlockCommand = true;
+    private Map<Long,DragonMoveThread> dragonThreadMap = new HashMap<>();
 
     public boolean isNotEnd() {
         return notEnd;
@@ -62,5 +66,13 @@ public class EngineDAO {
 
     public void setSelfNotBlockCommand(boolean selfNotBlockCommand) {
         this.selfNotBlockCommand = selfNotBlockCommand;
+    }
+
+    public Map<Long, DragonMoveThread> getDragonThreadMap() {
+        return dragonThreadMap;
+    }
+
+    public void setDragonThreadMap(Map<Long, DragonMoveThread> dragonThreadMap) {
+        this.dragonThreadMap = dragonThreadMap;
     }
 }
