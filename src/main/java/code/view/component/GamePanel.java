@@ -34,7 +34,7 @@ public class GamePanel extends JPanel {
     private MapDTO map;
 
 
-    private Map<EMapPointType,Image> mapImages;
+    private Map<EMapPointType,Image> mapImages = new HashMap<EMapPointType,Image>();
 
     private long timeStamp = 0;
     private int frameCount = 0;
@@ -69,6 +69,8 @@ public class GamePanel extends JPanel {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            drawElements(g,playerPosition);
 //            g.setColor(Color.GREEN);
 //            g.fillOval(playerPosition.x,playerPosition.y, WIDTH, HEIGHT);
         }
@@ -79,6 +81,38 @@ public class GamePanel extends JPanel {
             frameCount = 0;
             timeStamp = 0;
 
+        }
+    }
+
+    private void drawElements(Graphics g, Point playerPosition) {
+        int x = user.getPositionX();
+        int y = user.getPositionY();
+
+
+        int minX = 0;
+        int minY = 0;
+
+        g.setColor(Color.BLUE);
+
+        for(;playerPosition.x-minX*WIDTH>0;minX++){}
+        for(;playerPosition.y-minY*HEIGHT>0;minY++){}
+
+        for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH){
+            for(int actualY = playerPosition.y-minY*HEIGHT;actualY<height+HEIGHT;actualY+=HEIGHT) {
+                if(UtilData.isCorrectPosition(x-minX,y-minY)) {
+
+                    try {
+                        if(map.getMapPointTypes()[x-minX][y-minY] != EMapPointType.GROUND) {
+                            g.drawImage(getMapImage(x - minX, y - minY), actualX + user.getActualSharpX(), actualY + user.getActualSharpY(), null);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                y++;
+            }
+            y=user.getPositionY();
+            x++;
         }
     }
 
@@ -98,9 +132,8 @@ public class GamePanel extends JPanel {
         for(int actualX = playerPosition.x-minX*WIDTH;actualX<width+WIDTH;actualX+=WIDTH){
             for(int actualY = playerPosition.y-minY*HEIGHT;actualY<height+HEIGHT;actualY+=HEIGHT) {
                 if(UtilData.isCorrectPosition(x-minX,y-minY)) {
-
                     try {
-                        g.drawImage(getMapImage(x-minX, y-minY), actualX+user.getActualSharpX(), actualY+user.getActualSharpY(), null);
+                        g.drawImage(getMapImage(EMapPointType.GROUND), actualX+user.getActualSharpX(), actualY+user.getActualSharpY(), null);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -185,11 +218,14 @@ public class GamePanel extends JPanel {
     }
 
     private Image getMapImage(int x, int y) throws IOException {
-        if(mapImages == null){
-            mapImages = new HashMap<EMapPointType,Image>();
-        }
-
         EMapPointType mapPointType = map.getMapPointTypes()[x][y];
+        if(mapPointType == null) {
+            return getMapImage(EMapPointType.GROUND);
+        }
+        return getMapImage(mapPointType);
+    }
+
+    private Image getMapImage(EMapPointType mapPointType) throws IOException {
         Image result;
         if(mapImages.get(mapPointType) == null){
             File mapFile = new File(map.getMapType().getPath());
