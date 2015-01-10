@@ -33,11 +33,15 @@ public class DragonMoveThread extends AThread {
     @Override
     public void run() {
         if(status == EDragonStatus.STAY) {
-            stayOperation();
+            try {
+                stayOperation();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    private void stayOperation() {
+    private void stayOperation() throws InterruptedException {
         double distanceDragon = calculateDistance(dragonDTO.getPositionX(),loginUserDTO.getPositionX(), dragonDTO.getPositionY(), loginUserDTO.getPositionY());
         if(preferedMaxDistance < distanceDragon) {
 //            System.out.println("Smok: " + dragonDTO.getName() + " distance: " + distanceDragon);
