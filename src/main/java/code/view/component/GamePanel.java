@@ -167,10 +167,10 @@ public class GamePanel extends JPanel {
 
     private Image getDragonSkin(DragonDTO dragonDTO) throws IOException {
         if(dragonDTO.getDragonSkin() == null){
-            File skinFile = new File(dragonDTO.getDragonType().getPath());
+            File skinFile = new File(dragonDTO.getDragonType().getLeft());
             if(!skinFile.exists()){
                 ClassLoader classLoader = getClass().getClassLoader();
-                skinFile = new File(classLoader.getResource(EDragonType.DEFAULT.getPath()).getFile());
+                skinFile = new File(classLoader.getResource(dragonDTO.getDragonType().getLeft()).getFile());
             }
             BufferedImage readed = ImageIO.read(skinFile);
             dragonDTO.setDragonSkin(readed.getScaledInstance(WIDTH,HEIGHT,Image.SCALE_SMOOTH));
